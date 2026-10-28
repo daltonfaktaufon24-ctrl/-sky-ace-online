@@ -1,0 +1,323 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>SKY ACE — Flight Combat</title><meta name="description" content="Fly a fighter jet, battle enemy drones, and beat your high score in SKY ACE — a free browser flight game."><meta name="theme-color" content="#102d49"><meta property="og:title" content="SKY ACE — Free 3D Flight Combat"><meta property="og:description" content="Fly, explore islands and challenge rival pilots in your browser."><meta name="robots" content="index,follow"><style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#8bd0ee;color:white;font-family:system-ui,Arial;touch-action:none}canvas{display:block}#hud{position:fixed;inset:0;pointer-events:none}#top{display:flex;justify-content:space-between;padding:14px;gap:10px;text-shadow:0 2px 6px #123}#top>div{background:#061a2b99;border:1px solid #ffffff33;border-radius:12px;padding:9px 12px;font-size:13px}b{color:#f7d46e}#center{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-size:32px;color:#ffffffaa;text-shadow:0 0 6px #123}#bottom{position:absolute;bottom:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:end}#stick{width:128px;height:128px;border:2px solid #ffffff66;border-radius:50%;background:#102c4b55;pointer-events:auto;position:relative;touch-action:none}#nub{position:absolute;left:43px;top:43px;width:40px;height:40px;border-radius:50%;background:#ffffff99;border:2px solid white;box-shadow:0 0 15px #fff7}.actions{display:flex;gap:9px;pointer-events:auto}.btn{width:74px;height:74px;border-radius:50%;border:2px solid #ffffff99;background:#0d335ca8;color:white;font-weight:900;font-size:12px;touch-action:none}.btn.fire{background:#df5028dd}.btn:active{filter:brightness(1.4)}#menu{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(#0c345b99,#061625dc);z-index:4;text-align:center;padding:22px}#panel{max-width:430px;width:100%;padding:30px 22px;background:#0a2035e8;border:1px solid #ffffff44;border-radius:22px;box-shadow:0 20px 70px #0008}h1{font-size:40px;margin:0;color:#fff;text-shadow:0 4px #235}p{line-height:1.5;color:#cbe5f4}#start{border:0;background:#f9be43;color:#162436;padding:15px 36px;border-radius:14px;font-size:18px;font-weight:900}#pause{position:fixed;right:14px;top:75px;pointer-events:auto;background:#0a2035aa;color:white;border:1px solid #fff7;border-radius:9px;padding:8px 13px}#top{flex-wrap:wrap}#top>div{backdrop-filter:blur(8px)}#notice{position:absolute;top:26%;width:100%;text-align:center;font-weight:900;font-size:22px;color:#ffe084;text-shadow:0 3px 7px #000;opacity:0;transition:opacity .3s}@media(max-width:440px){#top{padding:8px;gap:5px}#top>div{font-size:10px;padding:7px}#stick{width:112px;height:112px}#nub{left:35px;top:35px}.btn{width:65px;height:65px}#pause{top:69px}}@media(min-width:800px){#bottom{bottom:24px;left:28px;right:28px}}
+@media(max-height:450px){#top>div{font-size:10px;padding:4px 7px}#bottom{bottom:6px}#stick{width:88px;height:88px}#nub{left:24px;top:24px}.btn{width:58px;height:58px}#pause{top:46px}#sound{top:84px!important}}
+#modePick button{padding:12px 15px;border-radius:12px;border:1px solid #8ec9e6;background:#102e48;color:white;font-weight:800;cursor:pointer}#modePick button.selectedMode{background:#f8c655;color:#162c41;border-color:#fff}#objective{position:fixed;top:92px;left:50%;transform:translateX(-50%);z-index:5;color:#fff;background:#0a2438cc;border:1px solid #ffffff50;border-radius:10px;padding:7px 13px;font:700 12px system-ui;text-align:center;pointer-events:none;max-width:70vw}#menu #panel{max-height:90dvh;overflow:auto}#radar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);width:112px;height:112px;border-radius:50%;border:2px solid #a9e8ff99;background:radial-gradient(circle,#15445a99,#061b30dd);pointer-events:none;z-index:3;box-shadow:0 0 18px #0af3}#radar:before,#radar:after{content:"";position:absolute;background:#8fe5ff55}#radar:before{height:1px;top:50%;width:100%}#radar:after{width:1px;left:50%;height:100%}#radarDots{position:absolute;inset:0}#radarDots i{position:absolute;width:6px;height:6px;background:#ff6258;border-radius:50%;box-shadow:0 0 5px #f33}#radarDots i.tank{background:#ffcb45;box-shadow:0 0 5px #fc3}#radar .me{position:absolute;top:48px;left:49px;color:#bff;z-index:2;font-size:16px}#lock{position:fixed;left:50%;top:51%;transform:translate(-50%,-50%);color:#ffe36b;font-size:12px;letter-spacing:2px;text-shadow:0 0 6px #000;pointer-events:none;z-index:3}#flightStats{position:fixed;left:50%;top:67px;transform:translateX(-50%);color:#d8f5ff;background:#0a2438aa;padding:5px 10px;border-radius:8px;font:700 11px system-ui;white-space:nowrap;pointer-events:none}#top>div{backdrop-filter:blur(6px)}@media(max-width:680px){#radar{width:82px;height:82px;bottom:16px}#radar .me{left:34px;top:31px}#flightStats{top:63px;font-size:10px}#objective{top:112px}}@media(max-height:450px){#radar{width:62px;height:62px;bottom:9px}#radar .me{left:24px;top:20px}#objective{top:65px}#flightStats{display:none}} #duelGuide{position:fixed;left:50%;top:31%;transform:translateX(-50%);background:#06243bdc;border:1px solid #ffdb7e;border-radius:10px;padding:7px 12px;color:#ffe08a;font-weight:900;font-size:14px;z-index:3;pointer-events:none;display:none;text-align:center;white-space:nowrap}#lockOnBtn{position:fixed;bottom:104px;right:20px;z-index:3;background:#ffcf57;color:#182b39;border:2px solid white;border-radius:14px;padding:10px 13px;font-weight:900;display:none;touch-action:none}#leaderboard{position:fixed;right:10px;top:166px;width:176px;max-height:calc(100dvh - 230px);overflow:auto;z-index:3;background:#061b30d9;border:1px solid #7dc9ef88;border-radius:12px;padding:9px;pointer-events:none;box-shadow:0 5px 20px #0018}#leaderboard header{font-size:12px;font-weight:900;color:#ffda7d;margin-bottom:5px}#leaderboard .entry{display:flex;justify-content:space-between;gap:5px;padding:4px 2px;border-bottom:1px solid #ffffff18;font-size:11px}#leaderboard .entry.me{color:#ffe07d;font-weight:900;background:#c98d2233;border-radius:5px}#leaderboard .entry span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#leaderboard footer{font-size:10px;color:#a8d5e9;padding-top:5px}#pilotName{padding:9px;border-radius:8px;border:1px solid #89c8e9;background:#071b2b;color:white;width:165px;max-width:100%;font-size:15px}@media(max-width:680px){#leaderboard{right:5px;top:157px;width:130px;max-height:37dvh;padding:6px}#leaderboard .entry{font-size:9px}#leaderboard header{font-size:10px}}@media(max-height:450px){#leaderboard{top:116px;max-height:calc(100dvh - 155px);width:128px}}
+/* Mobile HUD redesign: preserve unobstructed flight view and touch controls */
+#hud{isolation:isolate}
+#top{position:absolute;top:0;left:0;right:0;display:flex;flex-wrap:nowrap;gap:5px;padding:8px 8px 0;justify-content:space-between}
+#top>div{flex:1;min-width:0;text-align:center;font-size:11px;line-height:1.35;padding:6px 4px}
+#objective{top:60px;left:8px;transform:none;max-width:calc(100% - 170px);font-size:10px;padding:5px 7px;z-index:2}
+#flightStats{top:60px;left:auto;right:8px;transform:none;font-size:10px}
+#pause{top:93px;right:8px;font-size:12px;padding:6px 9px;z-index:3}
+#sound{top:129px!important;right:8px!important;font-size:11px;padding:6px 8px!important;z-index:3}
+#leaderboard{top:169px;right:8px;width:160px;max-height:230px;z-index:2;transition:height .15s}
+#leaderboard.collapsed{height:36px;overflow:hidden}
+#leaderboard header{display:flex;align-items:center;justify-content:space-between;gap:5px;cursor:pointer;pointer-events:auto}
+#leaderboard header button{pointer-events:auto;background:#254b69;border:1px solid #8dd0ef;color:#fff;border-radius:6px;padding:3px 7px;font-size:11px}
+#radar{left:50%;bottom:18px;width:76px;height:76px;z-index:2}
+#radar .me{left:30px;top:28px;font-size:13px}
+#bottom{z-index:4;bottom:12px;left:10px;right:10px}
+#duelGuide{top:27%;font-size:11px;max-width:80%;white-space:normal}
+#lockOnBtn{bottom:112px;right:10px;padding:7px 9px;font-size:11px}
+@media(max-width:700px){
+ #top{gap:4px;padding:6px 6px 0}
+ #top>div{font-size:10px;padding:5px 3px;border-radius:9px}
+ #objective{top:55px;left:6px;max-width:calc(100% - 130px);font-size:10px;line-height:1.3}
+ #flightStats{top:55px;right:6px;font-size:9px}
+ #pause{top:88px;right:6px}
+ #sound{top:123px!important;right:6px!important}
+ #leaderboard{top:159px;right:6px;width:126px;max-height:210px;padding:6px}
+ #leaderboard header{font-size:9px}
+ #leaderboard .entry{font-size:9px}
+ #leaderboard.collapsed{height:31px}
+ #stick{width:106px;height:106px}
+ #nub{left:33px;top:33px}
+ .btn{width:64px;height:64px}
+ #radar{bottom:132px;left:50%;width:64px;height:64px;opacity:.87}
+ #radar .me{left:24px;top:21px;font-size:13px}
+ #bottom{bottom:12px}
+ #lockOnBtn{bottom:105px}
+}
+@media(max-width:380px){
+ #top>div{font-size:9px}
+ #stick{width:96px;height:96px}
+ #nub{left:28px;top:28px}
+ .btn{width:58px;height:58px;font-size:10px}
+ #radar{bottom:117px;width:58px;height:58px}
+ #radar .me{left:21px;top:19px}
+}
+@media(max-height:500px) and (orientation:landscape){
+ #top{max-width:calc(100% - 170px)}
+ #top>div{font-size:9px}
+ #objective{top:46px}
+ #flightStats{display:none}
+ #pause{top:7px}
+ #sound{top:40px!important}
+ #leaderboard{top:75px;max-height:130px}
+ #radar{bottom:10px;left:50%;width:56px;height:56px}
+ #radar .me{left:20px;top:17px}
+ #stick{width:80px;height:80px}
+ #nub{left:20px;top:20px}
+ .btn{width:56px;height:56px}
+ #lockOnBtn{bottom:80px}
+}
+
+/* Single-screen menu, no scrolling required */
+#menu{padding:12px;overflow:hidden;align-items:center}
+#menu #panel{overflow:visible!important;max-height:calc(100dvh - 24px);padding:clamp(12px,2.3dvh,22px) 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(5px,1.2dvh,11px)}
+#menu h1{font-size:clamp(25px,6vw,36px);line-height:1.1}
+#menu #desc{font-size:clamp(12px,3.2vw,15px);line-height:1.55;margin:2px 0}
+#menu #panel>p{margin:2px 0!important}
+#modePick{margin:3px 0!important;gap:6px!important;width:100%}
+#modePick button{padding:10px 8px;font-size:clamp(11px,3vw,14px);flex:1 1 29%;white-space:nowrap}
+#start{padding:12px 34px;font-size:17px}
+#pilotName{font-size:14px;padding:7px;width:145px}
+@media(max-height:670px){#menu #panel{gap:3px;padding:10px}#menu #desc{font-size:12px;line-height:1.35}#modePick button{padding:8px 5px;font-size:11px}#start{padding:10px 30px}}
+@media(max-height:480px) and (orientation:landscape){#menu #panel{max-width:690px;width:95%;gap:3px;padding:7px 12px}#menu h1{font-size:23px}#menu #desc{font-size:11px;line-height:1.25}#menu #panel>p:last-child{display:none}#modePick button{padding:6px}}
+#menu{overflow:hidden}#panel{max-height:calc(100dvh - 24px);overflow-y:auto}#leaderboard{z-index:2}
+@media(max-width:700px){#leaderboard{max-height:205px}#top{gap:4px;padding:6px}#top>div{font-size:10px;padding:5px 6px}#objective{font-size:10px}#radar{width:70px;height:70px;bottom:128px;left:50%}#bottom{bottom:12px}#panel{padding:16px 14px}#panel h1{font-size:29px}}
+</style></head><body><div id="hud"><div id="top"><div>✈ SKY ACE<br>HP <span id="hp">100</span> · SHIELD <span id="shield">60</span></div><div>MISSION <b id="mission">1</b><br>DRONES <span id="kills">0</span>/5 · TANKS <span id="tankKills">0</span></div><div>SCORE <b id="score">0</b><br>SPEED <span id="speed">240</span> km/h</div></div><div id="objective">MISSION: 3 tanks + 2 fighters</div><div id="center">⊕</div><div id="lock"></div><div id="flightStats">ALT <span id="alt">36</span> m · TARGETS <span id="targets">0</span></div><div id="radar"><span class="me">▲</span><div id="radarDots"></div></div><div id="notice"></div><div id="duelGuide"></div><button id="lockOnBtn">📡 SCAN RIVAL</button><aside id="leaderboard" aria-label="Pilot rankings"><header>🏆 PILOT RANKINGS <button id="rankToggle" type="button" aria-label="Toggle rankings">▾</button></header><div id="rankRows"></div><footer>Local practice rankings · AI rivals</footer></aside><button id="pause">Ⅱ PAUSE</button><button id="sound" style="position:fixed;right:14px;top:119px;pointer-events:auto;background:#0a2035dd;color:white;border:1px solid #fff7;border-radius:9px;padding:8px 12px">🔊 SOUND ON</button><div id="bottom"><div id="stick"><div id="nub"></div></div><div class="actions"><button class="btn" id="boost">BOOST</button><button class="btn fire" id="fire">FIRE</button></div></div></div><div id="menu"><div id="panel"><h1>✈ SKY ACE</h1><p id="desc">Choose a mode and take off!<br><strong>CAMPAIGN</strong> · Defeat tanks and fighters<br><strong>FREE FLIGHT</strong> · Explore the islands<br><strong>CHALLENGE</strong> · Fight an AI pilot</p><p style="margin:8px 0">PILOT NAME <input id="pilotName" maxlength="16" placeholder="ACE PILOT" autocomplete="off"></p><div id="modePick" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0"><button id="campaignMode" class="selectedMode" type="button">🎯 CAMPAIGN</button><button id="freeMode" type="button">🌤️ FREE FLIGHT</button><button id="challengeMode" type="button">⚔️ CHALLENGE</button></div><button id="start">TAKE OFF</button><p style="font-size:12px">Free to play · No account needed</p></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"></script><script>
+(()=>{'use strict';
+const rankPanel=document.getElementById('leaderboard');
+const rankToggle=document.getElementById('rankToggle');
+function setRankCollapsed(v){rankPanel.classList.toggle('collapsed',v);rankToggle.textContent=v?'▸':'▾';rankToggle.setAttribute('aria-expanded',String(!v));}
+setRankCollapsed(window.innerWidth<=700);
+rankToggle.addEventListener('click',()=>setRankCollapsed(!rankPanel.classList.contains('collapsed')));
+const $=id=>document.getElementById(id);let scene,camera,renderer,plane,prop,world,trackingHeld=false,heading=0,pitch=0,enemies=[],tanks=[],bullets=[],enemyShots=[],particles=[],clock,playing=false,paused=false,frame=0,score=0,kills=0,mission=1,hp=100,shield=60,speed=240,fireCooldown=0,spawnCooldown=0,invuln=0,steerX=0,steerY=0,fireHeld=false,boostHeld=false,keys={},animationToken=0,shotsFired=0,shotsHit=0,tankKills=0,gameMode="campaign",campaignTanks=0,campaignJets=0,campaignComplete=false,credits=0;const V=()=>new THREE.Vector3();const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));const mat=(c,rough=.75,metal=0)=>new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:metal});let audioCtx=null,soundEnabled=true,lastLaser=0,radarClock=0,duelBot=null,duelTime=0,duelOver=false,duelWins=0,playerLives=3,rivalLives=3,duelRespawn=0;
+const botRanks=[['VIPER',7200],['FALCON',6100],['PHANTOM',5200],['STORM',4400],['RAVEN',3700],['EAGLE',2900],['NOVA',2100],['BLAZE',1500],['HAWK',900],['ROOKIE',350]];
+let totalPoints=0,recordedScore=0,pilotName='ACE PILOT';
+function loadRank(){try{totalPoints=Math.max(0,Number(localStorage.getItem('skyace_total_points')||0));pilotName=(localStorage.getItem('skyace_pilot_name')||'ACE PILOT').slice(0,16)}catch(e){}$('pilotName').value=pilotName;drawRanks()}
+function saveRank(){let delta=Math.max(0,score-recordedScore);if(delta){totalPoints+=delta;recordedScore=score;try{localStorage.setItem('skyace_total_points',String(totalPoints))}catch(e){}}drawRanks()}
+function drawRanks(){let rows=[...botRanks.map(([name,points])=>({name,points,me:false})),{name:pilotName,points:totalPoints+Math.max(0,score-recordedScore),me:true}].sort((a,b)=>b.points-a.points);let myRank=rows.findIndex(x=>x.me);let visible=rows.slice(0,8);if(myRank>=8)visible.push(rows[myRank]);$('rankRows').replaceChildren();visible.forEach((r,i)=>{let line=document.createElement('div');line.className='entry'+(r.me?' me':'');let name=document.createElement('span'),pts=document.createElement('strong');name.textContent=`#${r.me?myRank+1:i+1} ${r.name}`;pts.textContent=r.points.toLocaleString();line.append(name,pts);$('rankRows').append(line)});$('leaderboard').querySelector('footer').textContent=`Your rank: #${myRank+1} / ${rows.length} · Local AI rivals`}
+$('pilotName').addEventListener('change',()=>{pilotName=$('pilotName').value.trim().slice(0,16)||'ACE PILOT';$('pilotName').value=pilotName;try{localStorage.setItem('skyace_pilot_name',pilotName)}catch(e){}drawRanks()});
+loadRank();
+function initAudio(){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}catch(e){}}
+function sound(kind){if(!soundEnabled||!audioCtx||audioCtx.state!=='running')return;let t=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type=kind==='laser'?'sawtooth':'triangle';let start=kind==='laser'?850:kind==='hit'?210:130,end=kind==='laser'?210:kind==='hit'?65:40,duration=kind==='laser'?.105:kind==='hit'?.18:.38;o.frequency.setValueAtTime(start,t);o.frequency.exponentialRampToValueAtTime(end,t+duration);g.gain.setValueAtTime(kind==='laser'?.055:.12,t);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.start(t);o.stop(t+duration+.01)}
+function aimDirection(origin,forward){let best=null,bestAngle=.43;for(let e of (duelBot&&!duelOver?[duelBot]:enemies)){let delta=e.g.position.clone().sub(origin),dist=delta.length();if(dist>320||dist<1)continue;let dir=delta.normalize(),angle=dir.angleTo(forward);if(angle<bestAngle){bestAngle=angle;best=dir}}for(let t of tanks){if(!t.alive)continue;let delta=tankWorldPosition(t).add(new THREE.Vector3(0,3,0)).sub(origin),dist=delta.length();if(dist>310||dist<1)continue;let dir=delta.normalize(),angle=dir.angleTo(forward);if(angle<bestAngle){bestAngle=angle;best=dir}}return best?forward.clone().lerp(best,.67).normalize():forward.clone()}
+let mats={sea:mat(0x1689b5,.35),land:mat(0x68a66a),grass:mat(0x79b778),rock:mat(0x8b948a),sand:mat(0xe4d4a0),road:mat(0x555b62),building:mat(0xc7d5dc),roof:mat(0x537c9b),red:mat(0xd54432),wing:mat(0xc5dce7,.3,.45),dark:mat(0x263c55,.4,.3),glass:mat(0x58b9e3,.15,.3),yellow:mat(0xffd36a)};
+function mesh(g,m,parent,x=0,y=0,z=0){let o=new THREE.Mesh(g,m);o.position.set(x,y,z);parent.add(o);return o}function box(w,h,d,m,p,x,y,z){return mesh(new THREE.BoxGeometry(w,h,d),m,p,x,y,z)}function cone(r,h,m,p,x,y,z){return mesh(new THREE.ConeGeometry(r,h,6),m,p,x,y,z)}function rand(a,b){return a+Math.random()*(b-a)}
+function makePlane(){
+ let g=new THREE.Group(),navRed=mat(0xff4444,.3),navGreen=mat(0x46ff99,.3),stripe=mat(0xffc34d,.3,.3),steel=mat(0xe6f2fa,.25,.65);
+ // Streamlined fighter fuselage and tapered nose, all facing -Z.
+ let fus=mesh(new THREE.CylinderGeometry(.68,1.03,7.4,12),mats.wing,g,0,0,0);fus.rotation.x=Math.PI/2;
+ let nose=mesh(new THREE.ConeGeometry(.68,2.9,16),steel,g,0,0,-4.95);nose.rotation.x=-Math.PI/2;
+ let tail=mesh(new THREE.ConeGeometry(.93,1.7,12),mats.dark,g,0,0,4.25);tail.rotation.x=Math.PI/2;
+ // Swept wings: trapezoidal meshes give a modern silhouette.
+ function wing(side,z,span,depth,material){let shape=new THREE.Shape();shape.moveTo(0,-depth*.55);shape.lineTo(side*span,-depth*.15);shape.lineTo(side*span,depth*.40);shape.lineTo(0,depth*.60);let geo=new THREE.ExtrudeGeometry(shape,{depth:.16,bevelEnabled:true,bevelThickness:.07,bevelSize:.09,bevelSegments:1});let m=mesh(geo,material,g,0,-.02,z);m.rotation.x=Math.PI/2;return m}
+ wing(-1,.1,6.1,3.1,mats.wing);wing(1,.1,6.1,3.1,mats.wing);
+ wing(-1,3.3,2.8,1.6,mats.dark);wing(1,3.3,2.8,1.6,mats.dark);
+ let fin=box(.18,1.8,2.2,mats.red,g,0,1.05,3.2);fin.rotation.x=-.22;
+ let cockpit=mesh(new THREE.SphereGeometry(.8,18,12),mats.glass,g,0,.64,-1.35);cockpit.scale.set(.85,.60,2.0);
+ box(.10,.10,3.3,stripe,g,-.78,.12,-.2);box(.10,.10,3.3,stripe,g,.78,.12,-.2);
+ for(let side of [-1,1]){mesh(new THREE.SphereGeometry(.16,8,8),side<0?navRed:navGreen,g,side*5.8,.04,.5);let exhaust=mesh(new THREE.CylinderGeometry(.35,.43,1,10),mats.dark,g,side*.55,-.2,4.2);exhaust.rotation.x=Math.PI/2;mesh(new THREE.CylinderGeometry(.23,.28,.13,10),stripe,g,side*.55,-.2,4.75).rotation.x=Math.PI/2}
+ // Decorative spinning engine fan remains compatible with existing animation.
+ let propPivot=new THREE.Group();propPivot.position.z=4.82;g.add(propPivot);for(let i=0;i<4;i++){let blade=box(.13,1.15,.08,mats.dark,propPivot,0,0,0);blade.rotation.z=i*Math.PI/4}prop=propPivot;plane=g;scene.add(g)
+}
+// Shared geometry/materials keep detailed scenery efficient on mobile.
+const scenery={bark:mat(0x604832),pine:mat(0x245b42),pineLight:mat(0x347a50),leaf:mat(0x43844c),leafLight:mat(0x6a9c58),window:new THREE.MeshStandardMaterial({color:0x83c4e4,roughness:.22,metalness:.3,emissive:0x15384a,emissiveIntensity:.35}),concrete:mat(0xc1c5bd),brick:mat(0xa77f69),asphalt:mat(0x48525c),roof:mat(0x414f58),roadLine:new THREE.MeshBasicMaterial({color:0xe9dfad}),grass:mat(0x668c51),glassBlue:new THREE.MeshStandardMaterial({color:0x79b6d3,metalness:.45,roughness:.2}),metalRoof:mat(0x596c7a)};
+const geoTrunk=new THREE.CylinderGeometry(.45,.72,1,6),geoPine=new THREE.ConeGeometry(1,1,7),geoLeaf=new THREE.IcosahedronGeometry(1,1),geoCube=new THREE.BoxGeometry(1,1,1);
+function scaled(parent,geo,material,x,y,z,sx,sy,sz){let m=mesh(geo,material,parent,x,y,z);m.scale.set(sx,sy,sz);return m}
+function tree(parent,x,z,scale,type){let h=rand(9,16)*scale;
+ scaled(parent,geoTrunk,scenery.bark,x,5+h*.34,z,.85,h*.7,.85);
+ if(type==='pine'){
+  for(let k=0;k<3;k++){let crown=scaled(parent,geoPine,k%2?scenery.pine:scenery.pineLight,x,5+h*(.56+k*.18),z,h*(.25-k*.055),h*.48,h*(.25-k*.055));crown.rotation.y=rand(0,6.28)}
+ }else{
+  for(let k=0;k<3;k++)scaled(parent,geoLeaf,k%2?scenery.leafLight:scenery.leaf,x+rand(-2,2)*scale,5+h*(.78+rand(-.04,.08)),z+rand(-2,2)*scale,h*.30,h*.29,h*.30)
+ }}
+function island(parent,cx,cz,scale=1){
+ mesh(new THREE.CylinderGeometry(90*scale,100*scale,6,20),mats.sand,parent,cx,-2,cz);
+ mesh(new THREE.CylinderGeometry(82*scale,90*scale,5,20),mats.land,parent,cx,2,cz);
+ for(let i=0;i<15;i++){let x=cx+rand(-67,67)*scale,z=cz+rand(-67,67)*scale;if(Math.hypot(x-cx,z-cz)>72*scale||Math.hypot(x-cx,z-cz)<57*scale)continue;let h=rand(8,34)*scale;let mountain=cone(rand(8,16)*scale,h,mats.rock,parent,x,5+h/2,z);mountain.rotation.y=rand(0,6)}
+ for(let i=0;i<48;i++){let x=cx+rand(-73,73)*scale,z=cz+rand(-73,73)*scale;if(Math.hypot(x-cx,z-cz)>73*scale||Math.hypot(x-cx,z-cz)<45*scale)continue;tree(parent,x,z,scale*(.65+Math.random()*.45),i%4?'pine':'oak')}
+}
+let cityColliders=[];
+function city(parent,cx,cz){
+ box(465,3,465,mats.land,parent,cx,1,cz);
+ for(let i=0;i<13;i++)for(let j=0;j<13;j++){
+  let x=cx-192+i*32,z=cz-192+j*32;
+  if(i%3===0||j%3===0||((i*7+j*3)%11===0)){
+   box(31,.25,31,scenery.asphalt,parent,x,3,z);
+   if(i%3===0){for(let m=-1;m<=1;m++)box(.36,.035,4.2,scenery.roadLine,parent,x,3.18,z+m*9)}
+   if(j%3===0){for(let m=-1;m<=1;m++)box(4.2,.035,.36,scenery.roadLine,parent,x+m*9,3.18,z)}
+   if((i+j)%3===0)tree(parent,x+9,z+9,.38,'oak');
+   continue
+  }
+  if((i*5+j*7)%19===0){box(23,.2,23,scenery.grass,parent,x,3.2,z);for(let k=0;k<3;k++)tree(parent,x-7+k*7,z+4,.42,k===1?'pine':'oak');continue}
+  let h=rand(12,52),w=rand(12,19),d=rand(12,19),wall=(i+j)%3===0?scenery.brick:(i+j)%3===1?scenery.concrete:mats.building;
+  box(w,h,d,wall,parent,x,3+h/2,z);cityColliders.push({x,z,w,d,top:3+h});
+  box(w+.6,.65,d+.6,scenery.roof,parent,x,3+h,z);
+  // Window strips on visible facades; restrained geometry for mobile GPUs.
+  for(let y=7;y<h;y+=5){
+   for(let t=-1;t<=1;t++){
+    scaled(parent,geoCube,scenery.window,x+t*w*.27,3+y,z-d/2-.055,w*.16,1.7,.13);
+    scaled(parent,geoCube,scenery.window,x+w/2+.055,3+y,z+t*d*.27,.13,1.7,d*.16);
+   }
+  }
+  if(h>24)box(2,2,2,scenery.concrete,parent,x+2,4+h,z);
+  // Roof mechanical equipment, antennae and facade color accents.
+  if((i+j)%4===0){box(w*.4,.8,d*.25,scenery.metalRoof,parent,x-w*.16,4+h,z);box(.18,rand(2,6),.18,scenery.roof,parent,x+w*.25,5+h,z+d*.25)}
+  if((i*3+j)%5===0){box(w*.7,.3,d*.7,scenery.glassBlue,parent,x,3+h+.48,z)}
+  // Entrances and lit ground-level storefronts.
+  box(w*.38,2.8,.18,scenery.glassBlue,parent,x,4.4,z-d/2-.17);
+
+ }
+ // Tree-lined promenade, distinct from the city blocks.
+ for(let k=0;k<23;k++)tree(parent,cx-210+k*19,cz+219,.52,k%3?'oak':'pine');
+}
+function terrain(){cityColliders=[];world=new THREE.Group();scene.add(world);let sea=mesh(new THREE.PlaneGeometry(4000,4000,24,24),new THREE.MeshStandardMaterial({color:0x16799c,roughness:.34,metalness:.14,flatShading:true}),world,0,-9,0);sea.rotation.x=-Math.PI/2;island(world,-130,-250,2.15);island(world,170,-580,1.85);island(world,-110,-900,2.1);island(world,150,-1350,2.3);city(world,-130,-250);city(world,170,-580);island(world,0,-115,.95);for(let i=0;i<35;i++){let cloud=new THREE.Group(),x=rand(-450,450),z=rand(-1800,100),y=rand(65,135);for(let j=0;j<4;j++){let s=mesh(new THREE.SphereGeometry(rand(9,20),8,6),mat(0xffffff),cloud,rand(-18,18),rand(-4,4),rand(-8,8));s.scale.y=.45}cloud.position.set(x,y,z);world.add(cloud)}}
+function enemy(){
+ let g=new THREE.Group(),variant=Math.floor(Math.random()*3);
+ let hull=mat([0x596b79,0x6b7062,0x343d52][variant],.42,.65),wing=mat([0x8495a0,0x93917d,0x65738b][variant],.5,.45),trim=mat([0xe0523d,0xe2a641,0x53b5d2][variant],.5,.25),dark=mat(0x202a36,.48,.6),glass=mat(0x1a6585,.12,.35),glow=new THREE.MeshBasicMaterial({color:0xff7540});
+ // Detailed jet body: tapered nose, canopy, broad swept wings and twin engines.
+ let fuselage=mesh(new THREE.CylinderGeometry(.52,.9,5.3,12),hull,g,0,0,.1);fuselage.rotation.x=Math.PI/2;
+ let nose=mesh(new THREE.ConeGeometry(.52,2.2,12),wing,g,0,0,-3.6);nose.rotation.x=-Math.PI/2;
+ let cockpit=mesh(new THREE.SphereGeometry(.65,14,10),glass,g,0,.6,-1.15);cockpit.scale.set(.77,.7,1.65);
+ box(.11,.08,2.0,trim,g,0,1.03,-.9);
+ for(let side of [-1,1]){
+  let main=mesh(new THREE.BoxGeometry(3.6,.18,1.65),wing,g,side*2.0,.03,.3);main.rotation.y=side*.30;
+  let leading=box(2.3,.12,.18,trim,g,side*2.0,.16,-.54);leading.rotation.y=side*.30;
+  let tail=box(1.65,.13,1.05,wing,g,side*1.02,.15,2.05);tail.rotation.y=side*.28;
+  let fin=box(.13,1.3,1.15,hull,g,side*.65,.82,2.2);fin.rotation.z=side*-.18;
+  box(.24,.14,.65,dark,g,side*3.5,-.14,.6);
+  let light=mesh(new THREE.SphereGeometry(.15,8,8),new THREE.MeshBasicMaterial({color:side<0?0xff3636:0x4aff9c}),g,side*3.7,.08,.45);
+  let engine=mesh(new THREE.CylinderGeometry(.39,.45,2.1,10),dark,g,side*.45,-.3,2.05);engine.rotation.x=Math.PI/2;
+  mesh(new THREE.CylinderGeometry(.33,.33,.07,12),glow,g,side*.45,-.3,3.14).rotation.x=Math.PI/2;
+ }
+ box(.65,.12,.9,trim,g,0,.05,1.2);
+ // Scale up slightly so enemy silhouettes are recognizable on phones.
+ g.scale.setScalar(1.45);
+ g.position.set(plane.position.x-Math.sin(heading)*rand(130,210)+rand(-40,40),clamp(plane.position.y+rand(-14,14),15,190),plane.position.z-Math.cos(heading)*rand(130,210)+rand(-40,40));
+ scene.add(g);enemies.push({g,hp:3,phase:rand(0,6),cool:rand(1,4)})}
+
+function makeTank(x,z){
+ let g=new THREE.Group(),armor=mat(0x596f43,.7,.25),highlight=mat(0x83916a,.65,.2),dark=mat(0x202922,.9),steel=mat(0x404b45,.55,.5),wheelMat=mat(0x777e71,.8),lamp=new THREE.MeshBasicMaterial({color:0xffd276});
+ // Broad low-profile armored hull, front wedge and rear engine deck
+ box(7.3,1.7,10.4,armor,g,0,1.85,0);
+ let nose=mesh(new THREE.CylinderGeometry(3.4,4.4,2.2,4),armor,g,0,2,-4.25);nose.rotation.y=Math.PI/4;nose.scale.z=.75;
+ box(5.7,.35,3.3,highlight,g,0,2.8,3.1);
+ for(let side of [-1,1]){
+  box(1.65,2.2,11,dark,g,side*3.65,1.18,0);
+  box(.22,.6,10.5,steel,g,side*4.52,1.8,0);
+  for(let i=0;i<6;i++){let wheel=mesh(new THREE.CylinderGeometry(.73,.73,.35,12),wheelMat,g,side*4.57,.73,-4.2+i*1.65);wheel.rotation.z=Math.PI/2;}
+  box(.55,.35,.75,lamp,g,side*2.65,2.1,-5.2);
+ }
+ let turret=new THREE.Group();turret.position.y=3.25;g.add(turret);
+ mesh(new THREE.CylinderGeometry(2.65,3.05,1.65,10),armor,turret,0,.15,.25);
+ box(3.7,.55,3.2,highlight,turret,0,.75,.45);
+ box(.88,.86,7.4,steel,turret,0,.27,-4.45);
+ let muzzle=mesh(new THREE.CylinderGeometry(.58,.58,.7,10),dark,turret,0,.27,-8.15);muzzle.rotation.x=Math.PI/2;
+ box(1.2,.65,1.25,dark,turret,1.65,1.2,.4);
+ let hatch=mesh(new THREE.CylinderGeometry(.95,.95,.23,12),dark,turret,-.85,1.13,1.1);
+ // Glowing marker makes ground targets readable on mobile
+ let beacon=mesh(new THREE.ConeGeometry(2.5,5.5,6),new THREE.MeshBasicMaterial({color:0xff5d20,transparent:true,opacity:.85}),g,0,18,0);beacon.rotation.z=Math.PI;
+ let glow=mesh(new THREE.SphereGeometry(1.5,10,8),new THREE.MeshBasicMaterial({color:0xffeb64}),g,0,22,0);
+ let ring=mesh(new THREE.TorusGeometry(6,.35,6,24),new THREE.MeshBasicMaterial({color:0xff8e25}),g,0,.35,0);ring.rotation.x=Math.PI/2;
+ g.position.set(x,5.1,z);world.add(g);
+ tanks.push({g,turret,hp:7,maxHp:7,cool:rand(1.8,4),alive:true,glow,beacon,flash:0});
+}
+function placeTanks(){tanks=[];for(let island of [[0,-115,.55],[-130,-250,1.4],[170,-580,1.1],[-110,-900,1.5],[150,-1350,1.8]]){
+ const [cx,cz,scale]=island;
+ for(let i=0;i<4;i++){let angle=(i/4)*Math.PI*2+.35;
+ makeTank(cx+Math.cos(angle)*48*scale,cz+Math.sin(angle)*48*scale);
+ }} }
+function tankWorldPosition(t){return t.g.getWorldPosition(new THREE.Vector3())}
+function updateTanks(dt){if(gameMode==="free")return;
+ for(let t of tanks){if(!t.alive)continue;
+ let pos=tankWorldPosition(t),delta=plane.position.clone().sub(pos),dist=delta.length();
+ if(dist<330){t.turret.rotation.y=Math.atan2(-delta.x,-delta.z);t.glow.scale.setScalar(1+.16*Math.sin(frame*.09));
+ t.cool-=dt;
+ if(dist<235&&t.cool<=0){
+ let muzzle=pos.clone().add(new THREE.Vector3(0,4.1,0));
+ let lead=plane.position.clone().add(new THREE.Vector3(-Math.sin(heading)*9,0,-Math.cos(heading)*9));
+ shot(muzzle,lead.sub(muzzle).normalize(),true);boom(muzzle,0xffc43a);
+ t.cool=rand(2.3,4.3);}
+ }else t.cool=Math.min(t.cool,1.5);
+ }
+}
+
+function shot(origin,dir,hostile=false){let g=mesh(new THREE.CylinderGeometry(hostile?.28:.19,hostile?.28:.19,hostile?3.2:5.2,6),new THREE.MeshBasicMaterial({color:hostile?0xff513a:0xffe377}),scene,origin.x,origin.y,origin.z);g.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());bullets.push({g,dir:dir.clone(),hostile,life:3})}function boom(pos,color=0xffb64a){sound('boom');for(let i=0;i<12;i++){let g=mesh(new THREE.BoxGeometry(rand(.4,1.6),rand(.4,1.6),rand(.4,1.6)),mat(color),scene,pos.x,pos.y,pos.z);particles.push({g,v:new THREE.Vector3(rand(-12,12),rand(-12,12),rand(-12,12)),life:rand(.3,.8)})}}function damage(n){if(gameMode==="free"||campaignComplete||duelOver)return;if(invuln>0)return;sound('hit');let blocked=Math.min(shield,n);shield-=blocked;hp-=n-blocked;invuln=.45;boom(plane.position,0xff5b46);if(hp<=0){hp=0;if(gameMode==='challenge'){playerLives--;if(playerLives<=0)finishDuel(false);else{hp=100;shield=45;invuln=2.5;notice('AIRCRAFT LOST · '+playerLives+' LIVES LEFT')}}else end()}}function end(){saveRank();playing=false;animationToken++;let best=Math.max(score,Number(localStorage.getItem('skyace3d_best')||0));localStorage.setItem('skyace3d_best',best);$('desc').innerHTML=`Flight ended!<br><br>Score: <b>${score}</b> · Best: <b>${best}</b> · Accuracy: <b>${shotsFired?Math.round(shotsHit/shotsFired*100):0}%</b><br>Drones destroyed: <b>${(mission-1)*5+kills}</b> · Tanks destroyed: <b>${tankKills}</b><br><br>Try again and beat your score.`;$('start').textContent='FLY AGAIN';$('modePick').style.display='flex';$('menu').style.display='grid'}function notice(t){$('notice').textContent=t;$('notice').style.opacity=1;setTimeout(()=>{$('notice').style.opacity=0},1300)}
+function updateObjective(){let el=$('objective');if(gameMode==='free'){el.textContent='FREE FLIGHT · EXPLORE THE ISLANDS';return}if(gameMode==='challenge'){el.textContent=duelOver?'CHALLENGE FINISHED':`DUEL · YOU ${'♥'.repeat(playerLives)} · RIVAL ${'♥'.repeat(rivalLives)} · HP ${duelBot?Math.max(0,Math.ceil(duelBot.hp)):100} · ${Math.ceil(duelTime)}s`;return}el.textContent=campaignComplete?'MISSION COMPLETE · +500 CREDITS':`MISSION 1 · TANKS ${Math.min(3,campaignTanks)}/3 · FIGHTERS ${Math.min(2,campaignJets)}/2`}
+function checkCampaign(){if(gameMode!=='campaign'||campaignComplete)return;updateObjective();if(campaignTanks>=3&&campaignJets>=2){campaignComplete=true;credits+=500;score+=500;saveRank();shield=100;hp=Math.min(100,hp+30);try{localStorage.setItem('skyace_credits',String(credits))}catch(e){}notice('MISSION COMPLETE! +500 CREDITS');updateObjective();setTimeout(()=>{if(!playing)return;paused=true;$('pause').textContent='▶ RESUME';$('desc').innerHTML=`<b>MISSION COMPLETE!</b><br><br>You destroyed 3 tanks and 2 fighters.<br>Reward: <b>500 credits</b><br>Total credits: <b>${credits}</b><br><br>Choose FREE FLIGHT to explore, or restart Campaign to play again.`;$('start').textContent='PLAY AGAIN';$('modePick').style.display='flex';$('menu').style.display='grid';playing=false;animationToken++},1600)}}
+
+function finishDuel(won){if(duelOver)return;duelOver=true;$('duelGuide').style.display='none';$('lockOnBtn').style.display='none';playing=false;animationToken++;if(won){score+=750;credits+=300;try{localStorage.setItem('skyace_credits',String(credits));localStorage.setItem('skyace_duel_wins',String(Number(localStorage.getItem('skyace_duel_wins')||0)+1))}catch(e){}}saveRank();$('desc').innerHTML=`<b>${won?'🏆 VICTORY!':'💥 DEFEAT!'}</b><br><br>${won?'You shot down the computer rival! +300 credits':'Your aircraft was destroyed or time ran out.'}<br>Score: ${score} · Credits: ${credits}<br><br>Tap REMATCH for another dogfight.`;$('start').textContent='⚔️ REMATCH';$('modePick').style.display='flex';$('menu').style.display='grid';updateObjective()}
+function updateDuel(dt){
+ if(!duelBot||duelOver)return;
+ duelTime-=dt;if(duelTime<=0){finishDuel(false);return}
+ const bot=duelBot, fwd=new THREE.Vector3(-Math.sin(heading)*Math.cos(pitch),Math.sin(pitch),-Math.cos(heading)*Math.cos(pitch));
+ // Intercept in front, but periodically cross the player's view instead of tail-chasing.
+ const dist=bot.g.position.distanceTo(plane.position);
+ bot.aiTime=(bot.aiTime||0)+dt;
+ const playerRight=new THREE.Vector3(-fwd.z,0,fwd.x).normalize();
+ const cycle=bot.aiTime%22;
+ const forwardOffset=cycle<13?110:cycle<17?30:85;
+ const sideOffset=cycle<13?Math.sin(bot.aiTime*.32)*38:cycle<17?Math.sin(bot.aiTime*.8)*90:-Math.sin(bot.aiTime*.45)*48;
+ const destination=plane.position.clone().addScaledVector(fwd,forwardOffset).addScaledVector(playerRight,sideOffset);
+ destination.y=clamp(plane.position.y+Math.sin(bot.aiTime*.45)*12,22,175);
+ const desired=destination.sub(bot.g.position).normalize();
+ bot.velocity=bot.velocity||new THREE.Vector3(0,0,-1);
+ bot.velocity.lerp(desired,Math.min(1,dt*.95)).normalize();
+ const botSpeed=dist>180?112:dist>95?90:76;
+ bot.g.position.addScaledVector(bot.velocity,dt*botSpeed);
+ bot.g.position.y=clamp(bot.g.position.y,18,190);
+ bot.g.rotation.y=Math.atan2(-bot.velocity.x,-bot.velocity.z);
+ bot.g.rotation.z=Math.sin(frame*.025)*.15;
+ // Lead moving player using velocity estimated from recent frames.
+ const playerVelocity=plane.position.clone().sub(bot.lastPlayerPos||plane.position).divideScalar(Math.max(dt,.008));
+ bot.lastPlayerPos=plane.position.clone();
+ const toPlayer=plane.position.clone().sub(bot.g.position);
+ const travel=Math.min(1.5,toPlayer.length()/145);
+ const lead=plane.position.clone().addScaledVector(playerVelocity,travel*.42);
+ const aim=lead.sub(bot.g.position).normalize();
+ // Plane heading follows its actual movement, not an instant target lock.
+ bot.cool-=dt;
+ if(bot.cool<=0&&dist<155&&bot.velocity&&bot.velocity.dot(aim)>.25){
+   const muzzle=bot.g.position.clone().addScaledVector(aim,4);
+   shot(muzzle,aim,true);
+   bot.cool=rand(1.0,1.45);
+ }
+ const target=bot.g.position.clone().sub(plane.position).normalize();
+ const angle=Math.acos(clamp(fwd.dot(target),-1,1));
+ const guide=$('duelGuide');guide.style.display='block';
+ const cross=new THREE.Vector3().crossVectors(fwd,target).y;
+ guide.textContent=angle<.42&&dist<240?'🎯 RIVAL AHEAD · '+Math.round(dist)+'m · FIRE!':(cross>0?'⬅ RIVAL LEFT · '+Math.round(dist)+'m':'RIVAL RIGHT ➡ · '+Math.round(dist)+'m');
+ if(keys['l']||trackingHeld){guide.textContent='📡 SCAN: '+Math.round(dist)+' m · '+guide.textContent;}
+ updateObjective();
+}
+function chooseMode(mode){gameMode=mode;$('campaignMode').classList.toggle('selectedMode',mode==='campaign');$('freeMode').classList.toggle('selectedMode',mode==='free');$('challengeMode').classList.toggle('selectedMode',mode==='challenge');$('start').textContent=mode==='free'?'START FREE FLIGHT':mode==='challenge'?'START CHALLENGE':'START CAMPAIGN'}
+$('campaignMode').onclick=()=>chooseMode('campaign');$('freeMode').onclick=()=>chooseMode('free');$('challengeMode').onclick=()=>chooseMode('challenge');
+function start(){initAudio();animationToken++;if(!window.THREE){$('desc').textContent='The 3D engine could not load. Connect to the internet and reopen the game.';return}if(renderer){renderer.dispose();renderer.domElement.remove()}scene=new THREE.Scene();scene.background=new THREE.Color(0x9acfe8);scene.fog=new THREE.FogExp2(0x9acfe8,.00115);camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,.1,1800);try{renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});}catch(err){$('desc').textContent='3D graphics could not start. Open in Chrome and enable hardware acceleration.';return;}renderer.setPixelRatio(Math.min(devicePixelRatio,1.45));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.28;renderer.setSize(innerWidth,innerHeight);document.body.prepend(renderer.domElement);scene.add(new THREE.HemisphereLight(0xffffff,0x376b83,2.3));let sun=new THREE.DirectionalLight(0xfff2d8,2.9);sun.position.set(80,180,-120);scene.add(sun);terrain();if(gameMode==='campaign')placeTanks();else tanks=[];makePlane();plane.position.set(0,36,30);heading=0;pitch=0;camera.position.set(0,45,68);camera.lookAt(0,36,-30);clock=new THREE.Clock();enemies=[];bullets=[];particles=[];duelBot=null;duelOver=false;duelTime=210;playerLives=3;rivalLives=3;saveRank();score=0;recordedScore=0;kills=0;mission=1;shotsFired=0;shotsHit=0;tankKills=0;campaignTanks=0;campaignJets=0;campaignComplete=false;credits=Number(localStorage.getItem('skyace_credits')||0);steerX=steerY=0;fireHeld=boostHeld=false;hp=100;shield=60;speed=240;frame=0;fireCooldown=0;spawnCooldown=1;playing=true;paused=false;$('duelGuide').style.display=gameMode==='challenge'?'block':'none';$('lockOnBtn').style.display=gameMode==='challenge'?'block':'none';trackingHeld=false;if(gameMode==='challenge'){enemy();duelBot=enemies.pop();duelBot.hp=100;duelBot.g.position.set(105,clamp(plane.position.y+12,30,150),-165);duelBot.waypoint=null;duelBot.aiTime=0;duelBot.velocity=new THREE.Vector3(-.7,0,.7).normalize();duelBot.g.scale.multiplyScalar(1.7);duelBot.cool=2;}$('menu').style.display='none';updateObjective();$('pause').textContent='Ⅱ PAUSE';notice(gameMode==='challenge'?'FIND YOUR RIVAL · 3 LIVES EACH · 210 SECOND DUEL':gameMode==='campaign'?'RADAR: RED JETS · GOLD TANKS':'FREE FLIGHT · EXPLORE ANYWHERE');animate(animationToken)}
+function crashIntoBuilding(){if(!playing)return;boom(plane.position.clone(),0xff7628);sound('boom');hp=0;shield=0;playing=false;animationToken++;saveRank();$('desc').innerHTML='💥 BUILDING COLLISION!<br><br>Your aircraft crashed into a building. Watch your altitude and steer through the wide streets.<br><br>Score: <b>'+score+'</b>';$('start').textContent='FLY AGAIN';$('modePick').style.display='flex';$('menu').style.display='grid';}
+function animate(token){if(!playing||token!==animationToken)return;requestAnimationFrame(()=>animate(token));let dt=Math.min(clock.getDelta(),.05);if(paused){return;}frame++;let sx=clamp(steerX+(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),-1,1),sy=clamp(steerY+(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0),-1,1);let boosting=boostHeld||!!keys.Shift;speed+=( (boosting?400:240)-speed)*dt*2.5;heading-=sx*dt*1.25;pitch=clamp(pitch+(-sy)*dt*.85,-.65,.65);
+let forward=new THREE.Vector3(-Math.sin(heading)*Math.cos(pitch),Math.sin(pitch),-Math.cos(heading)*Math.cos(pitch));
+plane.position.addScaledVector(forward,speed*dt/3.6);
+plane.position.y=clamp(plane.position.y,12,210);
+// Aircraft-to-building collision (world can shift as the plane flies).
+const localX=plane.position.x-world.position.x,localZ=plane.position.z-world.position.z;
+for(const b of cityColliders){if(Math.abs(localX-b.x)<b.w/2+3.5&&Math.abs(localZ-b.z)<b.d/2+4&&plane.position.y<b.top+3){crashIntoBuilding();return;}}
+plane.rotation.order='YXZ';plane.rotation.y=heading;plane.rotation.x=pitch;
+plane.rotation.z+=(-sx*.58-plane.rotation.z)*Math.min(1,dt*4);
+prop.rotation.z+=dt*32;
+let behind=forward.clone().multiplyScalar(-36);
+let desired=plane.position.clone().add(behind).add(new THREE.Vector3(0,9,0));
+camera.position.lerp(desired,Math.min(1,dt*5));
+camera.lookAt(plane.position.clone().addScaledVector(forward,55));
+if(Math.abs(plane.position.x)>1450||Math.abs(plane.position.z)>1450){
+  let dx=plane.position.x,dz=plane.position.z;
+  world.position.x-=dx;world.position.z-=dz;
+  plane.position.x=0;plane.position.z=0;
+  for(let e of enemies){e.g.position.x-=dx;e.g.position.z-=dz}
+  for(let b of bullets){b.g.position.x-=dx;b.g.position.z-=dz}
+  for(let p of particles){p.g.position.x-=dx;p.g.position.z-=dz}
+  camera.position.x-=dx;camera.position.z-=dz;
+}
+updateTanks(dt);if(gameMode==='challenge'&&!duelOver)updateDuel(dt);fireCooldown-=dt;spawnCooldown-=dt;invuln-=dt;if((fireHeld||keys[' '])&&fireCooldown<=0){shot(plane.position.clone().add(forward.clone().multiplyScalar(5)),aimDirection(plane.position,forward));sound('laser');shotsFired++;fireCooldown=.13}if(gameMode==='campaign'&&!campaignComplete&&spawnCooldown<=0&&enemies.length<5){enemy();spawnCooldown=rand(Math.max(.45,1.1-mission*.07),Math.max(.8,2.1-mission*.08))}for(let i=enemies.length-1;i>=0;i--){let e=enemies[i];if(gameMode==='challenge'&&e===duelBot)continue;e.g.position.addScaledVector(plane.position.clone().sub(e.g.position).normalize(),dt*(19+mission*2));e.g.position.x+=Math.sin(frame*.015+e.phase)*dt*8;e.g.rotation.z=Math.sin(frame*.025+e.phase)*.32;e.g.rotation.y=Math.atan2(plane.position.x-e.g.position.x,plane.position.z-e.g.position.z)+Math.PI;e.cool-=dt;if(gameMode==='campaign'&&e.cool<0&&e.g.position.distanceTo(plane.position)<160){let dir=plane.position.clone().sub(e.g.position).normalize();shot(e.g.position.clone(),dir,true);e.cool=rand(2,4)}if(e.g.position.distanceTo(plane.position)<5){damage(30);boom(e.g.position);scene.remove(e.g);enemies.splice(i,1)}else if(e.g.position.distanceTo(plane.position)>320){scene.remove(e.g);enemies.splice(i,1)}}for(let i=bullets.length-1;i>=0;i--){let b=bullets[i];const oldBulletPos=b.g.position.clone();
+ b.g.position.addScaledVector(b.dir,dt*(b.hostile?150:240));b.life-=dt;let hit=false;if(b.hostile){// Continuous collision avoids fast bullets passing between frames.
+ const segment=b.g.position.clone().sub(oldBulletPos);
+ const segmentLengthSq=segment.lengthSq();
+ const t=segmentLengthSq>0?clamp(plane.position.clone().sub(oldBulletPos).dot(segment)/segmentLengthSq,0,1):0;
+ const nearest=oldBulletPos.clone().addScaledVector(segment,t);
+ if(nearest.distanceTo(plane.position)<6.5){damage(10);hit=true}}else{for(let j=(gameMode==='challenge'&&duelBot?0:enemies.length-1);j>=0;j--){let e=gameMode==='challenge'?duelBot:enemies[j];if(!e||duelOver)continue;if((()=>{const path=b.g.position.clone().sub(oldBulletPos),len=path.lengthSq(),t=len?clamp(e.g.position.clone().sub(oldBulletPos).dot(path)/len,0,1):0;return oldBulletPos.clone().addScaledVector(path,t).distanceTo(e.g.position)<(gameMode==='challenge'?12:10.5)})()){e.hp-=gameMode==='challenge'?20:1;hit=true;shotsHit++;sound('hit');if(gameMode==='challenge'){notice('RIVAL HIT · '+Math.max(0,Math.ceil(e.hp))+' HP');}if(e.hp<=0){boom(e.g.position);if(gameMode==='challenge'){rivalLives--;if(rivalLives<=0){scene.remove(e.g);finishDuel(true)}else{e.hp=100;e.g.position.copy(plane.position).add(new THREE.Vector3(95,15,-115));e.cool=2;notice('RIVAL DOWN! · '+rivalLives+' LIVES LEFT')}}else{scene.remove(e.g);enemies.splice(j,1);score+=100+Math.max(0,mission-1)*25;kills++;campaignJets++;checkCampaign()}}break}}if(!hit&&gameMode!=='challenge'){for(let t of tanks){if(!t.alive)continue;let pos=tankWorldPosition(t);if(b.g.position.distanceTo(pos.clone().add(new THREE.Vector3(0,2.2,0)))<7.5){t.hp--;hit=true;shotsHit++;sound('hit');t.glow.material.color.setHex(0xff3535);if(t.hp<=0){t.alive=false;boom(pos,0xff8c28);world.remove(t.g);tankKills++;campaignTanks++;score+=175;notice('TANK DESTROYED +175');checkCampaign()}break}}}}if(hit||b.life<=0){scene.remove(b.g);bullets.splice(i,1)}}for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.g.position.addScaledVector(p.v,dt);p.life-=dt;p.g.scale.multiplyScalar(.94);if(p.life<=0){scene.remove(p.g);particles.splice(i,1)}}shield=Math.min(100,shield+dt*.7);$('hp').textContent=Math.ceil(hp);$('shield').textContent=Math.ceil(shield);$('score').textContent=score;if(frame%25===0)drawRanks();$('tankKills').textContent=tankKills;$('kills').textContent=kills;$('mission').textContent=gameMode==='free'?'FREE':gameMode==='challenge'?'DUEL':'1';$('speed').textContent=Math.round(speed);if(frame%8===0){$('alt').textContent=Math.round(plane.position.y);$('targets').textContent=enemies.length+tanks.filter(t=>t.alive).length+(duelBot&&!duelOver?1:0);let radar=$('radarDots');radar.replaceChildren();let addDot=(pos,tank)=>{let dx=pos.x-plane.position.x,dz=pos.z-plane.position.z,cs=Math.cos(heading),sn=Math.sin(heading),rx=(dx*cs-dz*sn)/6,rz=(dx*sn+dz*cs)/6;const r=Math.hypot(rx,rz);if(r>44){rx*=44/r;rz*=44/r;}let d=document.createElement('i');if(tank)d.className='tank';d.style.left=`calc(50% + ${rx}px)`;d.style.top=`calc(50% + ${rz}px)`;radar.appendChild(d)};for(let e of enemies)addDot(e.g.position,false);if(duelBot&&!duelOver)addDot(duelBot.g.position,false);for(let t of tanks)if(t.alive)addDot(tankWorldPosition(t),true);let f=new THREE.Vector3(-Math.sin(heading)*Math.cos(pitch),Math.sin(pitch),-Math.cos(heading)*Math.cos(pitch));let target=aimDirection(plane.position,f);$('lock').textContent=target.angleTo(f)>.05?'◇ TARGET NEARBY':''}renderer.render(scene,camera)}
+$('lockOnBtn').addEventListener('pointerdown',e=>{e.preventDefault();trackingHeld=true});['pointerup','pointercancel','pointerleave'].forEach(ev=>$('lockOnBtn').addEventListener(ev,()=>trackingHeld=false));$('sound').onclick=()=>{soundEnabled=!soundEnabled;$('sound').textContent=soundEnabled?'🔊 SOUND ON':'🔇 SOUND OFF';if(soundEnabled){initAudio();sound('laser')}};$('start').onclick=start;$('pause').onclick=()=>{if(!playing)return;paused=!paused;$('pause').textContent=paused?'▶ RESUME':'Ⅱ PAUSE';if(!paused){clock.getDelta()}};window.addEventListener('resize',()=>{if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});window.addEventListener('keydown',e=>{keys[e.key]=true;if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault()});window.addEventListener('keyup',e=>keys[e.key]=false);const hold=(el,on,off)=>{el.addEventListener('pointerdown',e=>{e.preventDefault();el.setPointerCapture(e.pointerId);on()});el.addEventListener('pointerup',off);el.addEventListener('pointercancel',off)};hold($('fire'),()=>fireHeld=true,()=>fireHeld=false);hold($('boost'),()=>boostHeld=true,()=>boostHeld=false);let stick=$('stick'),nub=$('nub');function move(e){let r=stick.getBoundingClientRect(),x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2),d=Math.max(1,Math.hypot(x,y)),scale=Math.min(1,48/d);steerX=x*scale/48;steerY=y*scale/48;nub.style.transform=`translate(${steerX*43}px,${steerY*43}px)`}stick.addEventListener('pointerdown',e=>{stick.setPointerCapture(e.pointerId);move(e)});stick.addEventListener('pointermove',e=>{if(stick.hasPointerCapture(e.pointerId))move(e)});function reset(){steerX=steerY=0;nub.style.transform=''}stick.addEventListener('pointerup',reset);stick.addEventListener('pointercancel',reset);window.addEventListener('blur',()=>{fireHeld=false;boostHeld=false;trackingHeld=false;keys={}});document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing&&!paused){paused=true;$('pause').textContent='▶ RESUME';fireHeld=false;boostHeld=false;}});
+})();
+</script></body></html>
